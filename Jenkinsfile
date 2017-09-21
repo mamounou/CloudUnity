@@ -30,14 +30,14 @@ node {
          * First, the incremental build number from Jenkins
          * Second, the 'latest' tag.
          * Pushing multiple tags is cheap, as all the layers are reused. */
-        docker.withRegistry('https://eitpocregistry-on.azurecr.io', 'docker-hub-credentials') {
+        docker.withRegistry('https://experiences17.azurecr.io', 'azure-registry-credentials') {
             app.push("${env.BUILD_NUMBER}")
             app.push("latest")
         }
     }
     stage('wpapp dev env') {
         /* Ideally, we would run a test framework against our image.
-         * For this example, we're using a Volkswagen-type approach ;-) */
+         * For this example, we're using a Engie-type approach ;-) */
             
             sh 'docker stack deploy --with-registry-auth  -c docker-compose-dev.yml devapp'
         }
@@ -46,7 +46,7 @@ node {
     }
         stage('wpapp prod env')  {
         /* Ideally, we would run a test framework against our image.
-         * For this example, we're using a Volkswagen-type approach ;-) */
+         * For this example, we're using a Engie-type approach ;-) */
                
              sh 'docker stack deploy --with-registry-auth  -c docker-compose-prod.yml prodapp'
          }
