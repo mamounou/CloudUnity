@@ -1,0 +1,44 @@
+version: '3'
+services:
+   db-dev:
+     image: mysql:5.7
+     environment:
+       MYSQL_ROOT_PASSWORD: wordpress
+       MYSQL_DATABASE: wordpress
+       MYSQL_USER: wordpress
+       MYSQL_PASSWORD: wordpress
+     volumes:
+      - db-dev:/var/lib/mysql
+     deploy:
+       mode: replicated
+       replicas: 1
+       placement:
+         constraints: [node.role == manager]
+       restart_policy:
+         condition: any
+
+   wordpress-dev:
+     image: eitpocregistry-on.azurecr.io/eit/wp 
+     volumes:
+       - wp-dev:/var/www/html
+     ports:
+       - "80:80"
+     depends_on:
+       - db-dev
+     environment:
+       WORDPRESS_DB_HOST: db-dev:3306
+       WORDPRESS_DB_USER: wordpress
+       WORDPRESS_DB_PASSWORD: wordpress
+     deploy:
+       mode: replicated
+       replicas: 1
+       placement:
+         constraints: [node.role == worker]
+       restart_policy:
+         condition: on-failure
+
+volumes:
+  db-dev:
+    external: true  
+  wp-dev:
+     external: true 
