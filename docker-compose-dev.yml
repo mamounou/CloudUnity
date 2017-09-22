@@ -18,7 +18,7 @@ services:
          condition: any
 
    wordpress-dev:
-     image: eitpocregistry-on.azurecr.io/eit/wp 
+     image: experiences17.azurecr.io/eit/wp 
      volumes:
        - wp-dev:/var/www/html
      ports:
