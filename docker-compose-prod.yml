@@ -1,34 +1,41 @@
-version: '3'
+version: '3.3'
 services:
-   db-prod:
-     image: mysql:5.7
+   mysql:
+     image: mysql
+     secrets:
+       - mysqlprodrootpasswd
+       - mysqlprodpasswd
      environment:
-       MYSQL_ROOT_PASSWORD: wordpress
+       MYSQL_ROOT_PASSWORD_FILE: /run/secrets/mysqlprodrootpasswd
        MYSQL_DATABASE: wordpress
        MYSQL_USER: wordpress
-       MYSQL_PASSWORD: wordpress
+       MYSQL_PASSWORD_FILE: /run/secrets/mysqlprodpasswd
      volumes:
-      - wp-prod:/var/lib/mysql
+      - mysqlprod:/var/lib/mysql
      deploy:
        mode: replicated
        replicas: 1
        placement:
-         constraints: [node.role == manager]
+         constraints: [node.role == worker]
        restart_policy:
          condition: any
 
-   wordpress-prod:
-     image: experiences17.azurecr.io/eit/wp 
-     volumes:
-       - wp-prod:/var/www/html
+   wordpress:
+     image: wordpress
      ports:
-       - "8000:80"
+       - "80:80"
      depends_on:
-       - db-prod
+       - mysql
+     secrets:
+       - source: mysqlprodpasswd
+         target: wpdbprodpasswd
      environment:
-       WORDPRESS_DB_HOST: db-prod:3306
+       WORDPRESS_DB_HOST: mysql:3306
        WORDPRESS_DB_USER: wordpress
-       WORDPRESS_DB_PASSWORD: wordpress
+       WORDPRESS_DB_DATABASE: wordpress
+       WORDPRESS_DB_PASSWORD_FILE: /run/secrets/wpdbprodpasswd
+     volumes:
+      - wordpressprod:/var/www/html
      deploy:
        mode: replicated
        replicas: 1
@@ -38,7 +45,13 @@ services:
          condition: on-failure
 
 volumes:
-  wp-prod:
-    external: true 
-  wp-prod:
-    external: true 
+  mysqlprod:
+    external: true
+  wordpressprod:
+    external: true
+
+secrets:
+  mysqlprodrootpasswd:
+    external: true
+  mysqlprodpasswd:
+    external: true
