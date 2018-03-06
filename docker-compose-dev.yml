@@ -3,15 +3,15 @@ services:
    mysql:
      image: mysql
      secrets:
-       - mysqlprodrootpasswd
-       - mysqlprodpasswd
+       - mysqldevrootpasswd
+       - mysqldevpasswd
      environment:
-       MYSQL_ROOT_PASSWORD_FILE: /run/secrets/mysqlprodrootpasswd
+       MYSQL_ROOT_PASSWORD_FILE: /run/secrets/mysqldevrootpasswd
        MYSQL_DATABASE: wordpress
        MYSQL_USER: wordpress
-       MYSQL_PASSWORD_FILE: /run/secrets/mysqlprodpasswd
+       MYSQL_PASSWORD_FILE: /run/secrets/mysqldevpasswd
      volumes:
-      - mysqlprod:/var/lib/mysql
+      - mysqldev:/var/lib/mysql
      deploy:
        mode: replicated
        replicas: 1
@@ -27,15 +27,15 @@ services:
      depends_on:
        - mysql
      secrets:
-       - source: mysqlprodpasswd
-         target: wpdbprodpasswd
+       - source: mysqldevpasswd
+         target: wpdbdevpasswd
      environment:
        WORDPRESS_DB_HOST: mysql:3306
        WORDPRESS_DB_USER: wordpress
        WORDPRESS_DB_DATABASE: wordpress
-       WORDPRESS_DB_PASSWORD_FILE: /run/secrets/wpdbprodpasswd
+       WORDPRESS_DB_PASSWORD_FILE: /run/secrets/wpdbdevpasswd
      volumes:
-      - wordpressprod:/var/www/html
+      - wordpressdev:/var/www/html
      deploy:
        mode: replicated
        replicas: 1
@@ -45,13 +45,13 @@ services:
          condition: on-failure
 
 volumes:
-  mysqlprod:
+  mysqldev:
     external: true
-  wordpressprod:
+  wordpressdev:
     external: true
 
 secrets:
-  mysqlprodrootpasswd:
+  mysqldevrootpasswd:
     external: true
-  mysqlprodpasswd:
+  mysqldevpasswd:
     external: true
