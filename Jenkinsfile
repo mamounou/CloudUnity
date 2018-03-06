@@ -1,7 +1,7 @@
 node {
     def app
     
-    docker.withServer('tcp://172.17.0.1:2375'){
+    docker.withServer('tcp://172.18.0.1:2375'){
          
     stage('Clone repository') {
         /* Let's make sure we have the repository cloned to our workspace */
@@ -17,38 +17,36 @@ node {
     }
     
     stage('Test image') {
-        /* Ideally, we would run a test framework against our image.
-         * For this example, we're using a Volkswagen-type approach ;-) */
+        /* Ideally, we would run a test framework against our image. */
 
         app.inside {
             sh 'echo "Tests passed"'
         }
     }
 
-    stage('Push image') {
+    stage('Push image to registry') {
         /* Finally, we'll push the image with two tags:
          * First, the incremental build number from Jenkins
          * Second, the 'latest' tag.
          * Pushing multiple tags is cheap, as all the layers are reused. */
-        docker.withRegistry('https://experiences17.azurecr.io', 'azure-registry-credentials') {
-            app.push("${env.BUILD_NUMBER}")
-            app.push("latest")
-        }
+         sh 'echo "Tests passed"'
     }
-    stage('wpapp dev env') {
+    stage('deploy to DEV') {
         /* Ideally, we would run a test framework against our image.
          * For this example, we're using a Engie-type approach ;-) */
-            
-            sh 'docker stack deploy --with-registry-auth  -c docker-compose-dev.yml devapp'
+       
+           sh 'docker stack deploy -c myapp-dev.yml devapp'
+          
         }
     stage('Deploy approval'){
     input "Deploy to prod?"
     }
-        stage('wpapp prod env')  {
+        stage('deploy to PROD')  {
         /* Ideally, we would run a test framework against our image.
          * For this example, we're using a Engie-type approach ;-) */
-               
-             sh 'docker stack deploy --with-registry-auth  -c docker-compose-prod.yml prodapp'
-         }
-    }    
+       
+             sh 'docker stack deploy -c myapp-prod.yml prodapp'
+        
+      }
+   }    
 }  
