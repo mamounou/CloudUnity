@@ -1,7 +1,7 @@
-node {
+node ('Slave-Docker') {
     def app
     
-    docker.withServer('tcp://172.19.1.22:2375'){
+   
          
     stage('Clone repository') {
         /* Let's make sure we have the repository cloned to our workspace */
@@ -48,5 +48,5 @@ node {
              sh 'docker stack deploy -c myapp-prod.yml prodapp'
         
       }
-   }    
+     
 }  
