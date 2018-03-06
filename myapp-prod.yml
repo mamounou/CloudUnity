@@ -23,7 +23,7 @@ services:
    wordpress:
      image: wordpress
      ports:
-       - "80:80"
+       - "8000:80"
      depends_on:
        - mysql
      secrets:
